@@ -30,17 +30,16 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def script_userQueryTime(self, gesture):
 		d = wx.TextEntryDialog(gui.mainFrame, "Enter the number of minutes to wait before stopping sayall and hybernating.", "Reading is fun")
 		def callback(result):
-			if result == wx.ID_OK:
-				hibernate = gui.messageBox("Hibernate after say all?", "Reading is awesome!", style=wx.YES | wx.NO)
-				if hibernate == wx.YES:
-					self._hibernateAfter = True
-				else:
-					self._hibernateAfter = False
-				if self._timer:
-					self._timer.cancel()
-					self._timer = None
-				self._timer = Timer(float(d.GetValue())*60, self._stopSayAll)
-				self._timer.start()
+			if result != wx.ID_OK:
+				return
+
+			hibernate = gui.messageBox("Hibernate after say all?", "Reading is awesome!", style=wx.YES | wx.NO)
+			self._hibernateAfter = hibernate == wx.YES
+			if self._timer:
+				self._timer.cancel()
+				self._timer = None
+			self._timer = Timer(float(d.GetValue())*60, self._stopSayAll)
+			self._timer.start()
 		gui.runScriptModalDialog(d, callback)
 
 	script_userQueryTime.__doc__ = "Stops sayAll after the given time, and puts the computer in hibernate mode."
